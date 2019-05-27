@@ -1,0 +1,46 @@
+// CSS Grid mixin to allow css-grid with grid-gap if `display: grid` is not supported;
+
+// used for having cols
+@mixin span($cols, $gap: 40px, $base: 12) {
+	$totalGaps: ($base - 1) * $gap;
+	width: calc((100% - #{$totalGaps}) / #{$base} * #{$cols} + (#{($cols - 1) * $gap}));
+	@supports(display: grid) {
+			grid-column: span $cols;
+			width: auto;
+	}
+}
+
+// used for having cols with offset
+@mixin startSpanOffset($cols, $offset: 0, $gap: 40px, $base: 12) {
+	@include span($cols, $base);
+	$totalGaps: ($base - 1) * $gap;
+	margin-left: calc((100% - #{$totalGaps}) / #{$base} * #{$offset} + (#{$offset * $gap}));
+	@supports(display: grid) {
+			margin-left: 0;
+			grid-column: #{$offset + 1} / span $cols;
+	}
+}
+
+// usage for a 12 col bootstrap like grid with 40px gap: `@include grid(12, 40px);`
+@mixin grid($cols, $gap) {
+	$totalGaps: ($cols - 1) * $gap;
+	@supports(display: grid) {
+			display: grid;
+			grid-column-gap: #{$gap}px;
+			grid-template-columns: repeat($cols, 1fr);
+	}
+
+	> * {
+			float: left;
+			margin-right: #{$gap}px;
+			width: calc((100% - #{$totalGaps}) / #{$cols});
+			@supports(display: grid) {
+					float: none;
+					margin-right: 0;
+					width: auto;
+			}
+			&:last-child {
+				margin-right: 0;
+			}
+	}
+}
